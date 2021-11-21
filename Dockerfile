@@ -17,6 +17,7 @@ RUN set -eu; \
     rm -rf ~/.cache/pypoetry;
 
 COPY aoc_dashboard "${PROJECT_ROOT}"/aoc_dashboard
+COPY static "${PROJECT_ROOT}"/static
 COPY templates "${PROJECT_ROOT}"/templates
 
 # Compile bytecode for faster startup
