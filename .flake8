@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 120
+exclude = .venv
+ignore =
+    # Let `black` take care of these:
+    # E203: whitespace before ‘:’
+    # E501: line too long
+    # W503: binary operator after line break
+    E203,E501,W503
+# Let Flake8 ignore our __init__ that is used to enable to import directly from the module
+per-file-ignores = __init__.py:F401

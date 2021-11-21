@@ -1,0 +1,28 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Advent of Code - {{ year }}</title>
+    </head>
+
+    <body>
+        <table>
+            <tr>
+                <th>Position</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Draw Entries</th>
+            </tr>
+            {% for _, m in standings.standings.items() %}
+            <tr>
+                <td>{{ m.position }}</td>
+                <td>{{ m.name }}</td>
+                <td>{{ m.score }}</td>
+                <td>{{ m.draw_entries }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>Last update: {{ standings.timestamp.strftime("%Y-%m-%d %H:%M:%S UTC") }}</p>
+    </body>
+</html>
