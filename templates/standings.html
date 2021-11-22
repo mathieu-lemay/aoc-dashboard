@@ -8,23 +8,27 @@
     </head>
 
     <body>
-        <h1>Advent of Code - {{ year }}</h1>
-        <table>
-            <tr>
-                <th>Pos.</th>
-                <th>Name</th>
-                <th>Score</th>
-                <th>Draw Entries</th>
-            </tr>
-            {% for _, m in standings.standings.items() %}
-            <tr>
-                <td>{{ m.position }}</td>
-                <td>{{ m.name }}</td>
-                <td>{{ m.score }}</td>
-                <td>{{ m.draw_entries }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <p>Last update: {{ standings.timestamp.strftime("%Y-%m-%d %H:%M:%S UTC") }}</p>
+        <div class="main-table">
+            <h1 class="title">Advent of Code - {{ year }}</h1>
+            <table>
+                <tr>
+                    <th>Pos.</th>
+                    <th>Name</th>
+                    <th>Stars</th>
+                    <th>Score</th>
+                    <th>Draw Entries</th>
+                </tr>
+                {% for _, m in standings.standings.items() %}
+                <tr>
+                    <td>{{ m.position }}</td>
+                    <td>{{ m.name }}</td>
+                    <td>{% for i in range(25) %}<span class="{% if m.stars[i] == 2 %}star-both{% elif m.stars[i] == 1 %}star-first{% else %}star-none{% endif %}">*</span>{% endfor %}</td>
+                    <td>{{ m.score }}</td>
+                    <td>{{ m.draw_entries }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="last-update">Last update: {{ standings.timestamp.strftime("%Y-%m-%d %H:%M:%S UTC") }}</div>
+        </div>
     </body>
 </html>
