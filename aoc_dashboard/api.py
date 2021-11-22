@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from time import time as ts
-from typing import Dict
+from typing import Dict, List
 
 import requests
 from fastapi import FastAPI, Request, status
@@ -28,6 +28,7 @@ class MemberStanding(BaseModel):
     id_: int = Field(alias="id")
     name: str
     position: int
+    stars: List[int]
     score: int
     draw_entries: int
     last_star_ts: int
@@ -50,17 +51,23 @@ def _download_data(year: int) -> dict:
     return resp.json()
 
 
-def _get_score_of_entry(entry) -> int:
-    pts = 0
+def _get_score_of_entry(stars: List[int]) -> int:
+    score_map = {2: 3, 1: 1, 0: 0}
+    return sum(score_map[i] for i in stars)
+
+
+def _get_stars_of_entry(entry) -> List[int]:
+    stars = []
 
     for v in entry["completion_day_level"].values():
-        if "1" in v:
-            pts += 1
-
         if "2" in v:
-            pts += 2
+            stars.append(2)
+        elif "1" in v:
+            stars.append(1)
+        else:
+            stars.append(0)
 
-    return pts
+    return stars
 
 
 def _data_is_up_to_date(fp: str) -> bool:
@@ -79,12 +86,14 @@ def _get_standings(year: int) -> Standings:
     members = []
 
     for k, v in raw_standings["members"].items():
+        stars = _get_stars_of_entry(v)
         members.append(
             MemberStanding(
                 id=int(k),
                 name=v["name"],
                 position=0,
-                score=_get_score_of_entry(v),
+                stars=stars,
+                score=_get_score_of_entry(stars),
                 draw_entries=v["stars"],
                 last_star_ts=v["last_star_ts"],
             )
