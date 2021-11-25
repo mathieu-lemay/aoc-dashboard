@@ -30,6 +30,8 @@ class MemberStanding(BaseModel):
     position: int
     stars: List[int]
     score: int
+    gold_stars: int
+    silver_stars: int
     draw_entries: int
     last_star_ts: int
 
@@ -93,22 +95,27 @@ def _get_standings(year: int) -> Standings:
                 name=v["name"],
                 position=0,
                 stars=stars,
+                gold_stars=sum(1 for s in stars if s == 2),
+                silver_stars=sum(1 for s in stars if s > 0),
                 score=_get_score_of_entry(stars),
                 draw_entries=v["stars"],
                 last_star_ts=v["last_star_ts"],
             )
         )
 
-    members.sort(key=lambda m: (-m.score, m.last_star_ts))
+    members.sort(
+        key=lambda m: (-m.draw_entries, -m.gold_stars, -m.silver_stars, m.last_star_ts)
+    )
 
-    last_score = -1
+    last_score = (-1, -1)
     last_pos = 0
     for i, m in enumerate(members):
-        pos = last_pos if m.score == last_score else i + 1
+        s = (m.gold_stars, m.silver_stars)
+        pos = last_pos if s == last_score else i + 1
         m.position = pos
 
         last_pos = pos
-        last_score = m.score
+        last_score = s
 
     standings = Standings(
         standings={m.id_: m for m in members}, timestamp=datetime.utcnow()

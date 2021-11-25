@@ -15,7 +15,8 @@
                     <th>Pos.</th>
                     <th>Name</th>
                     <th>Stars</th>
-                    <th>Score</th>
+                    <th>Gold Stars</th>
+                    <th>Silver Stars</th>
                     <th>Draw Entries</th>
                 </tr>
                 {% for _, m in standings.standings.items() %}
@@ -23,7 +24,8 @@
                     <td>{{ m.position }}</td>
                     <td>{{ m.name }}</td>
                     <td>{% for i in range(25) %}<span class="{% if m.stars[i] == 2 %}star-both{% elif m.stars[i] == 1 %}star-first{% else %}star-none{% endif %}">*</span>{% endfor %}</td>
-                    <td>{{ m.score }}</td>
+                    <td>{{ m.gold_stars }}</td>
+                    <td>{{ m.silver_stars }}</td>
                     <td>{{ m.draw_entries }}</td>
                 </tr>
                 {% endfor %}
