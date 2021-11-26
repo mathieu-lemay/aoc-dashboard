@@ -60,15 +60,17 @@ def _get_score_of_entry(stars: List[int]) -> int:
 
 
 def _get_stars_of_entry(entry) -> List[int]:
-    stars = []
+    stars = [0] * 25
 
-    for v in entry["completion_day_level"].values():
+    for d, v in entry["completion_day_level"].items():
         if "2" in v:
-            stars.append(2)
+            s = 2
         elif "1" in v:
-            stars.append(1)
+            s = 1
         else:
-            stars.append(0)
+            s = 0
+
+        stars[int(d) - 1] = s
 
     return stars
 
