@@ -1,9 +1,13 @@
-FROM node:17-alpine AS webapp-builder
+FROM node:lts-alpine AS webapp-builder
 
 COPY webapp /webapp
+
+ARG SERVER_URL
+
 RUN set -eu; \
+    cd /webapp; \
     yarn install; \
-    echo '{"SERVER_URL":"https://aoc.acidrain.duckdns.org"}' > /webapp/src/config.json; \
+    echo '{"SERVER_URL":"'"${SERVER_URL}"'"}' > /webapp/src/config.json; \
     yarn build;
 
 

@@ -7,14 +7,12 @@ from typing import Dict, List
 import requests
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
 
 
 logger = logging.getLogger(__name__)
@@ -140,7 +138,7 @@ app.add_middleware(
 
 
 @app.exception_handler(Exception)
-async def exception_callback(_request: Request, exc: Exception):
+async def exception_callback(_: Request, exc: Exception):
     logger.exception(exc)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": str(exc)}
@@ -149,8 +147,7 @@ async def exception_callback(_request: Request, exc: Exception):
 
 @app.get("/standings/{year:int}")
 async def get_standings_for_year(year: int):
-    standings = _get_standings(year)
-    return standings
+    return _get_standings(year)
 
 
 @app.get("/standings")
@@ -158,14 +155,7 @@ async def get_standings():
     return await get_standings_for_year(CURRENT_YEAR)
 
 
-@app.get("/{year:int}")
-async def render_standings_for_year(request: Request, year):
-    standings = _get_standings(year)
-    return templates.TemplateResponse(
-        "standings.html", {"request": request, "year": year, "standings": standings}
-    )
-
-
 @app.get("/")
-async def render_standings(request: Request):
-    return await render_standings_for_year(request, CURRENT_YEAR)
+async def render_standings():
+    with open("templates/index.html") as f:
+        return HTMLResponse(f.read())
