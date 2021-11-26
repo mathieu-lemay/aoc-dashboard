@@ -1,3 +1,12 @@
+FROM node:17-alpine AS webapp-builder
+
+COPY webapp /webapp
+RUN set -eu; \
+    yarn install; \
+    echo '{"SERVER_URL":"https://aoc.acidrain.duckdns.org"}' > /webapp/src/config.json; \
+    yarn build;
+
+
 FROM acidrain/python-poetry:3.9-alpine
 
 ENV PROJECT_ROOT "/app"
@@ -17,8 +26,8 @@ RUN set -eu; \
     rm -rf ~/.cache/pypoetry;
 
 COPY aoc_dashboard "${PROJECT_ROOT}"/aoc_dashboard
-COPY static "${PROJECT_ROOT}"/static
-COPY templates "${PROJECT_ROOT}"/templates
+COPY --from=webapp-builder /webapp/build/index.html "${PROJECT_ROOT}"/templates/index.html
+COPY --from=webapp-builder /webapp/build/static "${PROJECT_ROOT}"/static
 
 # Compile bytecode for faster startup
 RUN python -m compileall *
