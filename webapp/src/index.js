@@ -88,9 +88,7 @@ class Dashboard extends React.Component {
         };
     }
 
-    componentDidMount() {
-        const { year } = this.state;
-
+    _refreshData(year) {
         fetch(configData.SERVER_URL + "/standings/" + year)
         .then(response => response.json())
         .then(response => {
@@ -99,6 +97,18 @@ class Dashboard extends React.Component {
         .catch(err => {
             console.log(err);
         });
+    }
+
+    componentDidMount() {
+        const { year } = this.state;
+
+        this._refreshData(year);
+    }
+
+    changeYear(year) {
+        this.setState({year: year});
+
+        this._refreshData(year);
     }
 
     render() {
@@ -115,6 +125,11 @@ class Dashboard extends React.Component {
         return (
             <div className="dashboard">
                 <h1 className="title">Advent of Code - {year}</h1>
+                <div className="prev-challenges">Previous challenges:
+                    <span className="switch-year" onClick={() => this.changeYear(2021)}>2021</span>
+                    <span className="switch-year" onClick={() => this.changeYear(2020)}>2020</span>
+                    <span className="switch-year" onClick={() => this.changeYear(2019)}>2019</span>
+                </div>
                 <StadingsGrid standings={standings} />
                 <div className="last-update">Last update: {
                     new Intl.DateTimeFormat("sv", {

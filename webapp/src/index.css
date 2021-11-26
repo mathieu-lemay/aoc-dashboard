@@ -13,6 +13,17 @@ body {
     text-align: center;
 }
 
+.prev-challenges {
+    font-size: 1.5em;
+    padding-bottom: 10px;
+}
+
+.switch-year {
+    margin: 0px 5px;
+    font-weight: bold;
+    cursor: default;
+}
+
 table {
     border-collapse: collapse;
 }
