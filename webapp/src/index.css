@@ -21,7 +21,7 @@ body {
 .switch-year {
     margin: 0px 5px;
     font-weight: bold;
-    cursor: default;
+    cursor: pointer;
 }
 
 table {
