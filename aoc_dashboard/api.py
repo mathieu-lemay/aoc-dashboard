@@ -93,7 +93,7 @@ def _get_standings(year: int) -> Standings:
         members.append(
             MemberStanding(
                 id=int(k),
-                name=v["name"],
+                name=v["name"] or f"anonymous user #{v['id']}",
                 position=0,
                 stars=stars,
                 gold_stars=sum(1 for s in stars if s == 2),
