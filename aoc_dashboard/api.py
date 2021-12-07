@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 from time import time as ts
-from typing import Dict, List
+from typing import List
 
 import requests
 from fastapi import FastAPI, Request, status
@@ -33,10 +33,11 @@ class MemberStanding(BaseModel):
     silver_stars: int
     draw_entries: int
     last_star_ts: int
+    part_2_average_time: float
 
 
 class Standings(BaseModel):
-    standings: Dict[str, MemberStanding]
+    standings: List[MemberStanding]
     timestamp: datetime
 
 
@@ -73,6 +74,16 @@ def _get_stars_of_entry(entry) -> List[int]:
     return stars
 
 
+def _get_part_2_average_time(completion_day_level) -> float:
+    completed_days = [d for d in completion_day_level.values() if "2" in d]
+    if not completed_days:
+        return 0
+
+    return sum(
+        d["2"]["get_star_ts"] - d["1"]["get_star_ts"] for d in completed_days
+    ) / len(completed_days)
+
+
 def _data_is_up_to_date(fp: str) -> bool:
     return os.path.exists(fp) and (ts() - os.path.getmtime(fp)) < 15 * 60
 
@@ -101,11 +112,19 @@ def _get_standings(year: int) -> Standings:
                 score=_get_score_of_entry(stars),
                 draw_entries=v["stars"],
                 last_star_ts=v["last_star_ts"],
+                part_2_average_time=_get_part_2_average_time(v["completion_day_level"]),
             )
         )
 
     members.sort(
-        key=lambda m: (-m.draw_entries, -m.gold_stars, -m.silver_stars, m.last_star_ts)
+        key=lambda m: (
+            m.draw_entries,
+            m.gold_stars,
+            m.silver_stars,
+            list(reversed(m.stars)),
+            -m.part_2_average_time,
+        ),
+        reverse=True,
     )
 
     last_score = (-1, -1)
@@ -118,14 +137,16 @@ def _get_standings(year: int) -> Standings:
         last_pos = pos
         last_score = s
 
-    standings = Standings(
-        standings={m.id_: m for m in members}, timestamp=datetime.utcnow()
-    )
+    standings = Standings(standings=members, timestamp=datetime.utcnow())
 
     with open(fp, "w") as f:
         f.write(standings.json(by_alias=True))
 
-    return standings
+    return standings.dict(
+        exclude={
+            "standings": {idx: {"part_2_average_time"} for idx in range(len(members))}
+        }
+    )
 
 
 app.add_middleware(
