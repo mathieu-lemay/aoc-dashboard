@@ -142,11 +142,7 @@ def _get_standings(year: int) -> Standings:
     with open(fp, "w") as f:
         f.write(standings.json(by_alias=True))
 
-    return standings.dict(
-        exclude={
-            "standings": {idx: {"part_2_average_time"} for idx in range(len(members))}
-        }
-    )
+    return standings
 
 
 app.add_middleware(

@@ -13,6 +13,7 @@ class Member extends React.Component {
             <td>{this.props.goldStars}</td>
             <td>{this.props.silverStars}</td>
             <td>{this.props.drawEntries}</td>
+            <td>{this.props.part2AvgTime.toFixed(2)}s</td>
         </tr>
         );
     }
@@ -51,6 +52,7 @@ class StadingsGrid extends React.Component {
                     goldStars={v.gold_stars}
                     silverStars={v.silver_stars}
                     drawEntries={v.draw_entries}
+                    part2AvgTime={v.part_2_average_time}
                 />
             );
         });
@@ -66,6 +68,7 @@ class StadingsGrid extends React.Component {
                         <th>Gold Stars</th>
                         <th>Silver Stars</th>
                         <th>Draw Entries</th>
+                        <th>Avg. Part 2 time</th>
                     </tr>
                 </thead>
                 <tbody>
