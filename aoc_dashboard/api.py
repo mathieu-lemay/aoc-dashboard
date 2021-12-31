@@ -73,7 +73,7 @@ def _get_stars_of_entry(entry, cutoff_time: Optional[datetime]) -> List[int]:
         if cutoff_time is None:
             return True
 
-        return cutoff_time >= entry[star_num]["get_star_ts"]
+        return entry[star_num]["get_star_ts"] < cutoff_time
 
     for d, v in entry["completion_day_level"].items():
         if _is_star_unlocked(v, 2):
@@ -112,7 +112,9 @@ def _get_standings(year: int) -> Standings:
     raw_standings = _download_data(year)
 
     cutoff_time = (
-        datetime(year, 12, 31, 23, 59, 59, 999999, pytz.UTC) if year >= 2021 else None
+        pytz.timezone("America/Montreal").localize(datetime(year + 1, 1, 1))
+        if year >= 2021
+        else None
     )
 
     members = []
