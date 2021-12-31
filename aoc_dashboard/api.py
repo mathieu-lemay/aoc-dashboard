@@ -2,8 +2,9 @@ import logging
 import os
 from datetime import datetime
 from time import time as ts
-from typing import List
+from typing import List, Optional
 
+import pytz
 import requests
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -58,13 +59,26 @@ def _get_score_of_entry(stars: List[int]) -> int:
     return sum(score_map[i] for i in stars)
 
 
-def _get_stars_of_entry(entry) -> List[int]:
+def _get_stars_of_entry(entry, cutoff_time: Optional[datetime]) -> List[int]:
     stars = [0] * 25
+    if cutoff_time:
+        cutoff_time = cutoff_time.timestamp()
+
+    def _is_star_unlocked(entry, star_num):
+        star_num = str(star_num)
+
+        if star_num not in entry:
+            return False
+
+        if cutoff_time is None:
+            return True
+
+        return cutoff_time >= entry[star_num]["get_star_ts"]
 
     for d, v in entry["completion_day_level"].items():
-        if "2" in v:
+        if _is_star_unlocked(v, 2):
             s = 2
-        elif "1" in v:
+        elif _is_star_unlocked(v, 2):
             s = 1
         else:
             s = 0
@@ -97,10 +111,14 @@ def _get_standings(year: int) -> Standings:
     logger.info("Refreshing file %s", os.path.basename(fp))
     raw_standings = _download_data(year)
 
+    cutoff_time = (
+        datetime(year, 12, 31, 23, 59, 59, 999999, pytz.UTC) if year >= 2021 else None
+    )
+
     members = []
 
     for k, v in raw_standings["members"].items():
-        stars = _get_stars_of_entry(v)
+        stars = _get_stars_of_entry(v, cutoff_time)
         members.append(
             MemberStanding(
                 id=int(k),
