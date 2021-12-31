@@ -78,7 +78,7 @@ def _get_stars_of_entry(entry, cutoff_time: Optional[datetime]) -> List[int]:
     for d, v in entry["completion_day_level"].items():
         if _is_star_unlocked(v, 2):
             s = 2
-        elif _is_star_unlocked(v, 2):
+        elif _is_star_unlocked(v, 1):
             s = 1
         else:
             s = 0
