@@ -159,6 +159,8 @@ def draw(coupons):
 standings = _get_standings(2021)
 
 for s in standings:
+    if s.draw_entries == 0:
+        continue
     print(f"{s.position:-2d}. {s.name}: {s.draw_entries}")
 
 
